@@ -1,0 +1,21 @@
+group 'com.shadow.dubbo'
+version '1.0-SNAPSHOT'
+
+apply plugin: 'java'
+
+sourceCompatibility = 1.8
+
+repositories {
+    maven {url "http://maven.aliyun.com/nexus/content/groups/public/"}
+    mavenLocal()
+    mavenCentral()
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+    compile "org.apache.tomcat.embed:tomcat-embed-core:8.5.34"
+    compile "javax.servlet:servlet-api:2.5"
+    compile "org.projectlombok:lombok:1.18.12"
+    compile "commons-io:commons-io:2.6"
+    compile "io.netty:netty-all:4.1.42.Final"
+}
