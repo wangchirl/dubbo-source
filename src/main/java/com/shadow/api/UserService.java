@@ -9,4 +9,5 @@ public interface UserService {
 
 	String say(String name);
 
+	String sum(int num1,int num2);
 }
