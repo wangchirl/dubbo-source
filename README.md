@@ -1,5 +1,5 @@
 ## 一、基于 HTTP 协议的实现
-### 服务端实现（com.shadow.framework.http.server.*）
+### 服务端实现（com.shadow.simulation.framework.http.server.*）
    ![tomcat架构图](./tomcat.png)
 ```java
         Tomcat tomcat = new Tomcat();
@@ -67,7 +67,7 @@
 
 
 ## 二、基于 Dubbo（Netty）协议的实现
-### 服务端实现（com.shadow.framework.dubbo.server.*）
+### 服务端实现（com.shadow.simulation.framework.dubbo.server.*）
    netty的基本使用
 ```java
 		NioEventLoopGroup bossGroup = new NioEventLoopGroup(1);
@@ -154,6 +154,48 @@
 ```
 
 ## Dubbo 原理
+### 一、Dubbo架构角色
+   ![Dubbo架构图](./dubbo-framework.jpg)
+   
    ![Dubbo](./dubbo.png)
    
-   ![Dubbo架构图](./)
+   节点	        角色说明
+   Provider	    暴露服务的服务提供方
+   Registry	    服务的注册与发现的注册中心，如zookeper(推荐)、multicast、redis、simple
+   Consumer	    调用远程服务的服务消费方
+   Monitor	    统计服务的调用次数和调用时间的监控中心
+   Container    服务运行容器
+   
+   调用流程:
+   
+    1.服务器负责启动，加载，运行服务提供者。
+    2.服务提供者在启动时，向注册中心注册自己所提供的服务
+    3.服务消费者在启动时，向注册中心订阅自己所需的服务
+    4.注册中心返回服务提供者地址列表给消费者，如果有变更，注册中心将基于TCP长连接推送变更数据给消费者
+    5.服务消费者从提供的服务列表中，基于软负载均衡算法，选一台提供者进行调用，如果失败，则选择另一台调用
+    6.服务消费者和提供者，在内存中累计调用次数和调用时间，定时每分钟发送一次统计数据到检测中心
+
+### 二、源码关键类
+    
+    1、DubboNamespaceHandler
+       ① ApplicationConfig
+       ② ModuleConfig
+       ③ RegistryConfig
+       ④ MonitorConfig
+       ⑤ ProviderConfig
+       ⑥ ConsumerConfig
+       ⑦ ProtocolConfig
+       ⑧ ServiceBean -> dubbo:service
+       ⑨ ReferenceBean -> dubbo:reference
+       ⑩ AnnotationBean
+       
+    2、BeanDefinitionParser -> DubboBeanDefinitionParser
+       Protocol -> DubboProtocol、RegistryProtocol
+      解析 XML 文件
+      
+    3、ServiceBean -> InitializingBean（afterPropertiesSet()）、ApplicationListener（onApplicationEvent(ContextRefreshedEvent)）
+      ① afterPropertiesSet()
+      ② onApplicationEvent(ContextRefreshedEvent) -> export() 暴露服务
+        
+    4、ReferenceBean -> FactoryBean（getObject()）
+      ① getObject() -> 获取代理对象
