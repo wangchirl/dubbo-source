@@ -154,6 +154,9 @@
 ```
 
 ## Dubbo 原理
+
+   ![Dubbo原理](./Dubbo原理.png)
+
 ### 一、Dubbo架构角色
    ![Dubbo架构图](./dubbo-framework.jpg)
    
